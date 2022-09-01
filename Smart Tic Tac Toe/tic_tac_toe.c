@@ -16,6 +16,8 @@ const static int PLAY_WITH_PLAYER = 2344;
 static char resultArray[9] = {'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'};
 static char inputArray[9] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 static int remainMove = 9;
+static char gameMove = 'o';
+static char gameEnd = 'f';
 
 // function declarations
 void clearScreen();
@@ -24,17 +26,18 @@ void startGame();
 void playWithPlayer();
 void playWithSmartComputer();
 void playWithEvilComputer();
-int isGameOver();
 char getResult();
 void setUsername(char *username, const char *message);
-void playGame(const int whichTypeGame, const char gameResult, const char *firstPlayerNam, const char *secondPlayerName);
+void playGame(const int whichTypeGame, const char *firstPlayerNam, const char *secondPlayerName);
 void restartGame();
 void askUsetToPlayAgainOrNot();
 int isValidMove(int move);
 int *nextMove(int whichTypeGame);
 void printBottomBar();
-int getValidInputMove(char move, const char *firstPlayerName, const char *secondPlayerName);
+int getValidInputMove(const char *firstPlayerName, const char *secondPlayerName);
 void printBoard(const char *firstPlayerName, const char *secondPlayerName);
+void printWinScreen(char winner, const char *firstPlayerName, const char *secondPlayerName);
+void printGameOverScreen(const char *firstPlayerName, const char *secondPlayerName);
 
 // function definations
 void clearScreen()
@@ -57,7 +60,10 @@ void startGame()
         if (dM == 1)
             printf("\n\nPlease enter valid choice : ");
         else
+        {
             printf("\n\nEnter your choice : ");
+            dM = 0;
+        }
         fflush(stdin);
         scanf("%d", &choice);
         switch (choice)
@@ -88,7 +94,7 @@ void playWithPlayer()
     char *secondPlayerName = (char *)malloc(30 * sizeof(char));
     setUsername(firstPlayerName, "Enter first player name");
     setUsername(secondPlayerName, "Enter second player name");
-    playGame(PLAY_WITH_PLAYER, getResult(), firstPlayerName, secondPlayerName);
+    playGame(PLAY_WITH_PLAYER, firstPlayerName, secondPlayerName);
 }
 
 void playWithSmartComputer()
@@ -96,7 +102,7 @@ void playWithSmartComputer()
     clearScreen();
     char *playerName = (char *)malloc(30 * sizeof(char));
     setUsername(playerName, "Enter player name");
-    playGame(PLAY_WITH_SMART_COMPUTER, getResult(), playerName, "Smart Computer");
+    playGame(PLAY_WITH_SMART_COMPUTER, playerName, "Smart Computer");
 }
 
 void playWithEvilComputer()
@@ -104,15 +110,7 @@ void playWithEvilComputer()
     clearScreen();
     char *playerName = (char *)malloc(30 * sizeof(char));
     setUsername(playerName, "Enter player name");
-    playGame(PLAY_WITH_EVIL_COMPUTER, getResult(), playerName, "Evil Computer");
-}
-
-int isGameOver()
-{
-    if (remainMove == 0)
-        return 1;
-    else
-        return 0;
+    playGame(PLAY_WITH_EVIL_COMPUTER, playerName, "Evil Computer");
 }
 
 char getResult()
@@ -146,53 +144,41 @@ void setUsername(char *username, const char *message)
         username[strlen(username) - 1] = '\0';
 }
 
-void playGame(const int whichTypeGame, const char gameResult, const char *firstPlayerName, const char *secondPlayerName)
+void playGame(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName)
 {
-    char gameEnd = 'f', move = 'o';
-    printBoard(firstPlayerName, secondPlayerName);
-    if (remainMove > 0)
+    if (remainMove <= 9 && remainMove >= 1)
     {
-        resultArray[getValidInputMove(move, firstPlayerName, secondPlayerName)] = move;
-        if (move == 'x')
-            move = 'o';
-        else
-            move = 'x';
-        if (remainMove <= 4)
-        {
-            switch (gameResult)
-            {
-            case 'x':
-                gameEnd = 't';
-                printColor(COLOR_BLUE);
-                printf("\nPlayer 2 - %s   ( X ) won", secondPlayerName);
-                break;
-            case 'o':
-                gameEnd = 't';
-                printColor(COLOR_GREEN);
-                printf("\n\nPlayer 1 - %s   ( O ) won", firstPlayerName);
-                break;
-            default:
-                gameEnd = 'f';
-            }
-        }
         --remainMove;
+        printBoard(firstPlayerName, secondPlayerName);
+        resultArray[getValidInputMove(firstPlayerName, secondPlayerName)] = gameMove;
+        switch (getResult())
+        {
+        case 'x':
+            gameEnd = 't';
+            printWinScreen('x', firstPlayerName, secondPlayerName);
+            break;
+        case 'o':
+            gameEnd = 't';
+            printWinScreen('o', firstPlayerName, secondPlayerName);
+            break;
+        default:
+            gameEnd = 'f';
+            playGame(whichTypeGame, firstPlayerName, secondPlayerName);
+        }
     }
-    else if (isGameOver())
+    else
     {
         gameEnd = 't';
-        printColor(COLOR_WHITE);
-        printf("\n\nGame Draw");
+        printGameOverScreen(firstPlayerName, secondPlayerName);
     }
-    printBottomBar();
-    if (gameEnd == 't')
-        askUsetToPlayAgainOrNot();
-    playGame(whichTypeGame, getResult(), firstPlayerName, secondPlayerName);
 }
 
 void restartGame()
 {
     fflush(stdin);
     remainMove = 9;
+    gameMove = 'o';
+    gameMove = 'f';
     for (int i = 0; i < 9; ++i)
     {
         resultArray[i] = 'e';
@@ -248,7 +234,7 @@ void printBottomBar()
     printf("\n\n###########################################################################");
 }
 
-int getValidInputMove(char move, const char *firstPlayerName, const char *secondPlayerName)
+int getValidInputMove(const char *firstPlayerName, const char *secondPlayerName)
 {
     int inputMove;
     int vMove = 1;
@@ -256,7 +242,7 @@ int getValidInputMove(char move, const char *firstPlayerName, const char *second
     {
         if (vMove != 1)
             printf("\n\nPlease enter valid marking place");
-        if (move == 'o')
+        if (gameMove == 'o')
         {
             printColor(COLOR_GREEN);
             printf("\n\nPlayer 1 - %s , Enter marking place   :   ", firstPlayerName);
@@ -264,15 +250,20 @@ int getValidInputMove(char move, const char *firstPlayerName, const char *second
         else
         {
             printColor(COLOR_BLUE);
-            printf("\n\nPlayer 1 - %s , Enter marking place   :   ", secondPlayerName);
+            printf("\n\nPlayer 2 - %s , Enter marking place   :   ", secondPlayerName);
         }
         fflush(stdin);
-        scanf("%d", &inputMove);
+        inputMove = _getch() - 48;
+        printf("%d", inputMove);
         if (isValidMove(inputMove))
             vMove = 1;
         else
             vMove = 0;
     } while (vMove != 1);
+    if (gameMove == 'x')
+        gameMove = 'o';
+    else
+        gameMove = 'x';
     return inputMove - 1;
 }
 
@@ -293,12 +284,15 @@ void printBoard(const char *firstPlayerName, const char *secondPlayerName)
         for (int j = 0; j < 3; ++j)
         {
             if (resultArray[index] == 'x')
-                printColor(COLOR_BLUE);
-            else if (resultArray[index] == 'o')
                 printColor(COLOR_GREEN);
+            else if (resultArray[index] == 'o')
+                printColor(COLOR_BLUE);
             else
                 printColor(COLOR_WHITE);
-            printf("   %c   ", inputArray[index]);
+            if (resultArray[index] == 'e')
+                printf("   %c   ", inputArray[index]);
+            else
+                printf("   %c   ", resultArray[index]);
             printColor(COLOR_YELLOW);
             if ((index + 1) % 3 != 0)
                 printf("|");
@@ -307,4 +301,30 @@ void printBoard(const char *firstPlayerName, const char *secondPlayerName)
         printf("\n_______|_______|_______\n");
     }
     printf("\n\n###########################################################################");
+}
+
+void printWinScreen(char winner, const char *firstPlayerName, const char *secondPlayerName)
+{
+    printBoard(firstPlayerName, secondPlayerName);
+    if (winner == 'x')
+    {
+        printColor(COLOR_GREEN);
+        printf("\n\nPlayer 2 - %s   ( X ) won", firstPlayerName);
+    }
+    else if (winner == 'o')
+    {
+        printColor(COLOR_BLUE);
+        printf("\n\nPlayer 1 - %s   ( O ) won", secondPlayerName);
+    }
+    printBottomBar();
+    askUsetToPlayAgainOrNot();
+}
+
+void printGameOverScreen(const char *firstPlayerName, const char *secondPlayerName)
+{
+    printBoard(firstPlayerName, secondPlayerName);
+    printColor(COLOR_WHITE);
+    printf("\n\nGame Draw");
+    printBottomBar();
+    askUsetToPlayAgainOrNot();
 }
