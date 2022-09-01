@@ -34,16 +34,13 @@ void askUsetToPlayAgainOrNot();
 int isValidMove(int move);
 int *nextMove(int whichTypeGame);
 void printBottomBar();
-int getValidInputMove(const char *firstPlayerName, const char *secondPlayerName);
+int getValidInputMove(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName);
 void printBoard(const char *firstPlayerName, const char *secondPlayerName);
 void printWinScreen(char winner, const char *firstPlayerName, const char *secondPlayerName);
 void printGameOverScreen(const char *firstPlayerName, const char *secondPlayerName);
 
 // function definations
-void clearScreen()
-{
-    system("cls");
-}
+void clearScreen() { system("cls"); }
 
 void printColor(const char *COLOR) { printf("%s", COLOR); }
 
@@ -53,15 +50,15 @@ void startGame()
     do
     {
         clearScreen();
-        printf("\n1. Want to play with Smart Computer");
-        printf("\n2. Want to play with Evil Computer");
-        printf("\n3. Want to play with Player");
-        printf("\n4. Exit");
+        printf("\n\t\t\t1. Want to play with Smart Computer");
+        printf("\n\t\t\t2. Want to play with Evil Computer");
+        printf("\n\t\t\t3. Want to play with Player");
+        printf("\n\t\t\t4. Exit");
         if (dM == 1)
-            printf("\n\nPlease enter valid choice : ");
+            printf("\n\n\t\t\tPlease enter valid choice : ");
         else
         {
-            printf("\n\nEnter your choice : ");
+            printf("\n\n\t\t\tEnter your choice : ");
             dM = 0;
         }
         fflush(stdin);
@@ -79,6 +76,7 @@ void startGame()
             break;
         case 4:
             clearScreen();
+            printColor(COLOR_DEFAULT);
             exit(0);
             break;
         default:
@@ -92,8 +90,8 @@ void playWithPlayer()
     clearScreen();
     char *firstPlayerName = (char *)malloc(30 * sizeof(char));
     char *secondPlayerName = (char *)malloc(30 * sizeof(char));
-    setUsername(firstPlayerName, "Enter first player name");
-    setUsername(secondPlayerName, "Enter second player name");
+    setUsername(firstPlayerName, "\t\t\tEnter first player name");
+    setUsername(secondPlayerName, "\t\t\tEnter second player name");
     playGame(PLAY_WITH_PLAYER, firstPlayerName, secondPlayerName);
 }
 
@@ -101,7 +99,7 @@ void playWithSmartComputer()
 {
     clearScreen();
     char *playerName = (char *)malloc(30 * sizeof(char));
-    setUsername(playerName, "Enter player name");
+    setUsername(playerName, "\t\t\tEnter player name");
     playGame(PLAY_WITH_SMART_COMPUTER, playerName, "Smart Computer");
 }
 
@@ -109,7 +107,7 @@ void playWithEvilComputer()
 {
     clearScreen();
     char *playerName = (char *)malloc(30 * sizeof(char));
-    setUsername(playerName, "Enter player name");
+    setUsername(playerName, "\t\t\tEnter player name");
     playGame(PLAY_WITH_EVIL_COMPUTER, playerName, "Evil Computer");
 }
 
@@ -150,7 +148,7 @@ void playGame(const int whichTypeGame, const char *firstPlayerName, const char *
     {
         --remainMove;
         printBoard(firstPlayerName, secondPlayerName);
-        resultArray[getValidInputMove(firstPlayerName, secondPlayerName)] = gameMove;
+        resultArray[getValidInputMove(whichTypeGame, firstPlayerName, secondPlayerName)] = gameMove;
         switch (getResult())
         {
         case 'x':
@@ -194,8 +192,8 @@ void askUsetToPlayAgainOrNot()
     do
     {
         if (repeat == 1)
-            printf("\nPlease enter valid input");
-        printf("\n\nAre you want to play again ? (y / n)  :  ");
+            printf("\n\t\tPlease enter valid input");
+        printf("\n\n\t\tAre you want to play again ? (y / n)  :  ");
         fflush(stdin);
         scanf("%c", &playOrNot);
         if (playOrNot == 'y' || playOrNot == 'Y')
@@ -203,6 +201,7 @@ void askUsetToPlayAgainOrNot()
         else if (playOrNot == 'n' || playOrNot == 'N')
         {
             clearScreen();
+            printColor(COLOR_DEFAULT);
             exit(0);
         }
         else
@@ -219,13 +218,19 @@ int isValidMove(int move)
 
 int *nextMove(int whichTypeGame)
 {
+    int *move;
     if (whichTypeGame == PLAY_WITH_SMART_COMPUTER)
     {
+        move = (int *)malloc(sizeof(int) * 1);
+        for (int i = 0; i < 9; ++i)
+        {
+        }
     }
     else if (whichTypeGame == PLAY_WITH_EVIL_COMPUTER)
     {
+        move = (int *)malloc(sizeof(int) * 2);
     }
-    return NULL;
+    return move;
 }
 
 void printBottomBar()
@@ -234,26 +239,38 @@ void printBottomBar()
     printf("\n\n###########################################################################");
 }
 
-int getValidInputMove(const char *firstPlayerName, const char *secondPlayerName)
+int getValidInputMove(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName)
 {
     int inputMove;
     int vMove = 1;
     do
     {
         if (vMove != 1)
-            printf("\n\nPlease enter valid marking place");
+            printf("\n\n\t\tPlease enter valid marking place");
         if (gameMove == 'o')
         {
             printColor(COLOR_GREEN);
-            printf("\n\nPlayer 1 - %s , Enter marking place   :   ", firstPlayerName);
+            printf("\n\n\t\tPlayer 1 - %s , Enter marking place   :   ", firstPlayerName);
         }
         else
         {
             printColor(COLOR_BLUE);
-            printf("\n\nPlayer 2 - %s , Enter marking place   :   ", secondPlayerName);
+            printf("\n\n\t\tPlayer 2 - %s , Enter marking place   :   ", secondPlayerName);
         }
         fflush(stdin);
-        inputMove = _getch() - 48;
+        if (whichTypeGame == PLAY_WITH_PLAYER)
+            inputMove = _getch() - 48;
+        else if (whichTypeGame == PLAY_WITH_SMART_COMPUTER)
+        {
+            int *moves = nextMove(PLAY_WITH_SMART_COMPUTER);
+            inputMove = moves[0];
+        }
+        else if (whichTypeGame == PLAY_WITH_EVIL_COMPUTER)
+        {
+            int *size = 0;
+            int *moves = nextMove(PLAY_WITH_EVIL_COMPUTER);
+            inputMove = moves[0];
+        }
         printf("%d", inputMove);
         if (isValidMove(inputMove))
             vMove = 1;
@@ -274,15 +291,21 @@ void printBoard(const char *firstPlayerName, const char *secondPlayerName)
     printColor(COLOR_YELLOW);
     printf("\n\n############################### Tic Tac Toe ###############################");
     printColor(COLOR_GREEN);
-    printf("\n\nPlayer 1 - %s   ( O )", firstPlayerName);
+    printf("\n\n\n\t\tPlayer 1 - %s   ( O )\n", firstPlayerName);
     printColor(COLOR_BLUE);
-    printf("\nPlayer 2 - %s   ( X )\n\n\n", secondPlayerName);
+    printf("\n\t\tPlayer 2 - %s   ( X )\n\n", secondPlayerName);
+    printColor(COLOR_YELLOW);
+    printf("\n\t\t\t _______ _______ _______\n");
     for (int i = 0; i < 3; ++i)
     {
         printColor(COLOR_YELLOW);
-        printf("       |       |       \n");
+        printf("\t\t\t|       |       |       |\n");
         for (int j = 0; j < 3; ++j)
         {
+            if (j == 0)
+                printf("\t\t\t|");
+            else
+                printf("|");
             if (resultArray[index] == 'x')
                 printColor(COLOR_GREEN);
             else if (resultArray[index] == 'o')
@@ -294,11 +317,11 @@ void printBoard(const char *firstPlayerName, const char *secondPlayerName)
             else
                 printf("   %c   ", resultArray[index]);
             printColor(COLOR_YELLOW);
-            if ((index + 1) % 3 != 0)
+            if ((index + 1) % 3 == 0)
                 printf("|");
             ++index;
         }
-        printf("\n_______|_______|_______\n");
+        printf("\n\t\t\t|_______|_______|_______|\n");
     }
     printf("\n\n###########################################################################");
 }
@@ -309,12 +332,12 @@ void printWinScreen(char winner, const char *firstPlayerName, const char *second
     if (winner == 'x')
     {
         printColor(COLOR_GREEN);
-        printf("\n\nPlayer 2 - %s   ( X ) won", firstPlayerName);
+        printf("\n\n\t\t\tPlayer 1 - %s   ( O ) won", firstPlayerName);
     }
     else if (winner == 'o')
     {
         printColor(COLOR_BLUE);
-        printf("\n\nPlayer 1 - %s   ( O ) won", secondPlayerName);
+        printf("\n\n\t\t\tPlayer 2 - %s   ( X ) won", secondPlayerName);
     }
     printBottomBar();
     askUsetToPlayAgainOrNot();
@@ -324,7 +347,7 @@ void printGameOverScreen(const char *firstPlayerName, const char *secondPlayerNa
 {
     printBoard(firstPlayerName, secondPlayerName);
     printColor(COLOR_WHITE);
-    printf("\n\nGame Draw");
+    printf("\n\n\t\t\tGame Draw");
     printBottomBar();
     askUsetToPlayAgainOrNot();
 }
