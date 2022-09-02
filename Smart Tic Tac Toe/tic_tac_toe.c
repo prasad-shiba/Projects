@@ -4,186 +4,42 @@
 #include <string.h>
 #include <time.h>
 
-const static char COLOR_RED[] = "\x1b[31m";
-const static char COLOR_GREEN[] = "\x1b[32m";
-const static char COLOR_YELLOW[] = "\x1b[33m";
 const static char COLOR_BLUE[] = "\x1b[34m";
-const static char COLOR_WHITE[] = "\033[0;37m";
 const static char COLOR_DEFAULT[] = "\x1b[0m";
-const static int PLAY_WITH_SMART_COMPUTER = 2342;
-const static int PLAY_WITH_EVIL_COMPUTER = 2343;
+const static char COLOR_GREEN[] = "\x1b[32m";
+const static char COLOR_RED[] = "\x1b[31m";
+const static char COLOR_WHITE[] = "\033[0;37m";
+const static char COLOR_YELLOW[] = "\x1b[33m";
 const static int PLAY_WITH_PLAYER = 2344;
-static char resultArray[9] = {'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'};
+const static int PLAY_WITH_EVIL_COMPUTER = 2343;
+const static int PLAY_WITH_SMART_COMPUTER = 2342;
 static char inputArray[9] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+static char resultArray[9] = {'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'};
 static int remainMove = 9;
-static char gameMove = 'o';
 static char gameEnd = 'f';
+static char gameMove = 'o';
 
 // function declarations
-void clearScreen();
-void printColor(const char *COLOR);
-void startGame();
-void playWithPlayer();
-void playWithSmartComputer();
-void playWithEvilComputer();
-char getResult();
-void setUsername(char *username, const char *message);
-void playGame(const int whichTypeGame, const char *firstPlayerNam, const char *secondPlayerName);
-void restartGame();
 void askUsetToPlayAgainOrNot();
+void clearScreen();
+char getResult();
+int getValidInputMove(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName);
 int isValidMove(int move);
 int *nextMove(int whichTypeGame);
 void printBottomBar();
-int getValidInputMove(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName);
 void printBoard(const char *firstPlayerName, const char *secondPlayerName);
-void printWinScreen(char winner, const char *firstPlayerName, const char *secondPlayerName);
+void printColor(const char *COLOR);
 void printGameOverScreen(const char *firstPlayerName, const char *secondPlayerName);
+void printWinScreen(char winner, const char *firstPlayerName, const char *secondPlayerName);
+void playGame(const int whichTypeGame, const char *firstPlayerNam, const char *secondPlayerName);
+void playWithEvilComputer();
+void playWithPlayer();
+void playWithSmartComputer();
+void restartGame();
+void setUsername(char *username, const char *message);
+void startGame();
 
 // function definations
-void clearScreen() { system("cls"); }
-
-void printColor(const char *COLOR) { printf("%s", COLOR); }
-
-void startGame()
-{
-    int choice, dM = 0;
-    do
-    {
-        clearScreen();
-        printf("\n\t\t\t1. Want to play with Smart Computer");
-        printf("\n\t\t\t2. Want to play with Evil Computer");
-        printf("\n\t\t\t3. Want to play with Player");
-        printf("\n\t\t\t4. Exit");
-        if (dM == 1)
-            printf("\n\n\t\t\tPlease enter valid choice : ");
-        else
-        {
-            printf("\n\n\t\t\tEnter your choice : ");
-            dM = 0;
-        }
-        fflush(stdin);
-        scanf("%d", &choice);
-        switch (choice)
-        {
-        case 1:
-            playWithSmartComputer();
-            break;
-        case 2:
-            playWithEvilComputer();
-            break;
-        case 3:
-            playWithPlayer();
-            break;
-        case 4:
-            clearScreen();
-            printColor(COLOR_DEFAULT);
-            exit(0);
-            break;
-        default:
-            dM = 1;
-        }
-    } while (1);
-}
-
-void playWithPlayer()
-{
-    clearScreen();
-    char *firstPlayerName = (char *)malloc(30 * sizeof(char));
-    char *secondPlayerName = (char *)malloc(30 * sizeof(char));
-    setUsername(firstPlayerName, "\t\t\tEnter first player name");
-    setUsername(secondPlayerName, "\t\t\tEnter second player name");
-    playGame(PLAY_WITH_PLAYER, firstPlayerName, secondPlayerName);
-}
-
-void playWithSmartComputer()
-{
-    clearScreen();
-    char *playerName = (char *)malloc(30 * sizeof(char));
-    setUsername(playerName, "\t\t\tEnter player name");
-    playGame(PLAY_WITH_SMART_COMPUTER, playerName, "Smart Computer");
-}
-
-void playWithEvilComputer()
-{
-    clearScreen();
-    char *playerName = (char *)malloc(30 * sizeof(char));
-    setUsername(playerName, "\t\t\tEnter player name");
-    playGame(PLAY_WITH_EVIL_COMPUTER, playerName, "Evil Computer");
-}
-
-char getResult()
-{
-    char result = 'd';
-    if ((resultArray[0] == resultArray[1]) && (resultArray[1] == resultArray[2]) && (resultArray[0] != 'e'))
-        result = resultArray[0];
-    else if ((resultArray[0] == resultArray[4]) && (resultArray[4] == resultArray[8]) && (resultArray[0] != 'e'))
-        result = resultArray[0];
-    else if ((resultArray[0] == resultArray[3]) && (resultArray[3] == resultArray[6]) && (resultArray[0] != 'e'))
-        result = resultArray[0];
-    else if ((resultArray[1] == resultArray[4]) && (resultArray[4] == resultArray[7]) && (resultArray[1] != 'e'))
-        result = resultArray[1];
-    else if ((resultArray[2] == resultArray[4]) && (resultArray[4] == resultArray[6]) && (resultArray[2] != 'e'))
-        result = resultArray[2];
-    else if ((resultArray[2] == resultArray[5]) && (resultArray[5] == resultArray[8]) && (resultArray[2] != 'e'))
-        result = resultArray[2];
-    else if ((resultArray[3] == resultArray[4]) && (resultArray[4] == resultArray[5]) && (resultArray[3] != 'e'))
-        result = resultArray[3];
-    else if ((resultArray[6] == resultArray[7]) && (resultArray[7] == resultArray[8]) && (resultArray[6] != 'e'))
-        result = resultArray[6];
-    return result;
-}
-
-void setUsername(char *username, const char *message)
-{
-    fflush(stdin);
-    printf("\n%s : ", message);
-    fgets(username, 30, stdin);
-    if (strlen(username) > 1)
-        username[strlen(username) - 1] = '\0';
-}
-
-void playGame(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName)
-{
-    if (remainMove <= 9 && remainMove >= 1)
-    {
-        --remainMove;
-        printBoard(firstPlayerName, secondPlayerName);
-        resultArray[getValidInputMove(whichTypeGame, firstPlayerName, secondPlayerName)] = gameMove;
-        switch (getResult())
-        {
-        case 'x':
-            gameEnd = 't';
-            printWinScreen('x', firstPlayerName, secondPlayerName);
-            break;
-        case 'o':
-            gameEnd = 't';
-            printWinScreen('o', firstPlayerName, secondPlayerName);
-            break;
-        default:
-            gameEnd = 'f';
-            playGame(whichTypeGame, firstPlayerName, secondPlayerName);
-        }
-    }
-    else
-    {
-        gameEnd = 't';
-        printGameOverScreen(firstPlayerName, secondPlayerName);
-    }
-}
-
-void restartGame()
-{
-    fflush(stdin);
-    remainMove = 9;
-    gameMove = 'o';
-    gameMove = 'f';
-    for (int i = 0; i < 9; ++i)
-    {
-        resultArray[i] = 'e';
-        inputArray[i] = i + 1;
-    }
-    startGame();
-}
 
 void askUsetToPlayAgainOrNot()
 {
@@ -209,34 +65,28 @@ void askUsetToPlayAgainOrNot()
     } while (repeat == 1);
 }
 
-int isValidMove(int move)
-{
-    if (move >= 1 && (move <= 9) && (resultArray[move - 1] == 'e'))
-        return 1;
-    return 0;
-}
+void clearScreen() { system("cls"); }
 
-int *nextMove(int whichTypeGame)
+char getResult()
 {
-    int *move;
-    if (whichTypeGame == PLAY_WITH_SMART_COMPUTER)
-    {
-        move = (int *)malloc(sizeof(int) * 1);
-        for (int i = 0; i < 9; ++i)
-        {
-        }
-    }
-    else if (whichTypeGame == PLAY_WITH_EVIL_COMPUTER)
-    {
-        move = (int *)malloc(sizeof(int) * 2);
-    }
-    return move;
-}
-
-void printBottomBar()
-{
-    printColor(COLOR_YELLOW);
-    printf("\n\n###########################################################################");
+    char result = 'd';
+    if ((resultArray[0] == resultArray[1]) && (resultArray[1] == resultArray[2]) && (resultArray[0] != 'e'))
+        result = resultArray[0];
+    else if ((resultArray[0] == resultArray[4]) && (resultArray[4] == resultArray[8]) && (resultArray[0] != 'e'))
+        result = resultArray[0];
+    else if ((resultArray[0] == resultArray[3]) && (resultArray[3] == resultArray[6]) && (resultArray[0] != 'e'))
+        result = resultArray[0];
+    else if ((resultArray[1] == resultArray[4]) && (resultArray[4] == resultArray[7]) && (resultArray[1] != 'e'))
+        result = resultArray[1];
+    else if ((resultArray[2] == resultArray[4]) && (resultArray[4] == resultArray[6]) && (resultArray[2] != 'e'))
+        result = resultArray[2];
+    else if ((resultArray[2] == resultArray[5]) && (resultArray[5] == resultArray[8]) && (resultArray[2] != 'e'))
+        result = resultArray[2];
+    else if ((resultArray[3] == resultArray[4]) && (resultArray[4] == resultArray[5]) && (resultArray[3] != 'e'))
+        result = resultArray[3];
+    else if ((resultArray[6] == resultArray[7]) && (resultArray[7] == resultArray[8]) && (resultArray[6] != 'e'))
+        result = resultArray[6];
+    return result;
 }
 
 int getValidInputMove(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName)
@@ -251,27 +101,39 @@ int getValidInputMove(const int whichTypeGame, const char *firstPlayerName, cons
         {
             printColor(COLOR_GREEN);
             printf("\n\n\t\tPlayer 1 - %s , Enter marking place   :   ", firstPlayerName);
+            fflush(stdin);
+            inputMove = _getch() - 48;
         }
         else
         {
             printColor(COLOR_BLUE);
             printf("\n\n\t\tPlayer 2 - %s , Enter marking place   :   ", secondPlayerName);
+            if (whichTypeGame == PLAY_WITH_PLAYER)
+            {
+                fflush(stdin);
+                inputMove = _getch() - 48;
+                printf("%d", inputMove);
+                inputMove -= 1;
+                system("pause");
+            }
+            else if (whichTypeGame == PLAY_WITH_SMART_COMPUTER)
+            {
+                int *moves = nextMove(PLAY_WITH_SMART_COMPUTER);
+                inputMove = moves[0];
+                free(moves);
+                printf("%d", inputMove);
+                system("pause");
+            }
+            else if (whichTypeGame == PLAY_WITH_EVIL_COMPUTER)
+            {
+                int *size = 0;
+                int *moves = nextMove(PLAY_WITH_EVIL_COMPUTER);
+                inputMove = moves[0];
+                free(moves);
+                printf("%d", inputMove);
+                system("pause");
+            }
         }
-        fflush(stdin);
-        if (whichTypeGame == PLAY_WITH_PLAYER)
-            inputMove = _getch() - 48;
-        else if (whichTypeGame == PLAY_WITH_SMART_COMPUTER)
-        {
-            int *moves = nextMove(PLAY_WITH_SMART_COMPUTER);
-            inputMove = moves[0];
-        }
-        else if (whichTypeGame == PLAY_WITH_EVIL_COMPUTER)
-        {
-            int *size = 0;
-            int *moves = nextMove(PLAY_WITH_EVIL_COMPUTER);
-            inputMove = moves[0];
-        }
-        printf("%d", inputMove);
         if (isValidMove(inputMove))
             vMove = 1;
         else
@@ -282,6 +144,61 @@ int getValidInputMove(const int whichTypeGame, const char *firstPlayerName, cons
     else
         gameMove = 'x';
     return inputMove - 1;
+}
+
+int isValidMove(int move)
+{
+    if (move >= 1 && (move <= 9) && (resultArray[move - 1] == 'e'))
+        return 1;
+    return 0;
+}
+
+int *nextMove(int whichTypeGame)
+{
+    int *move;
+    if (whichTypeGame == PLAY_WITH_SMART_COMPUTER)
+    {
+        move = (int *)malloc(sizeof(int) * 1);
+        srand(time(0));
+        if (remainMove == 7)
+        {
+            int corner_arr[4] = {0, 2, 6, 8};
+            int side_arr[4] = {1, 3, 5, 7};
+            int op;
+            for (int i = 0; i < 9; ++i)
+            {
+                if (resultArray[i] == 'o')
+                {
+                    op = i;
+                    break;
+                }
+            }
+            if (op == corner_arr[0] || op == corner_arr[1] || op == corner_arr[2] || op == corner_arr[3])
+                *move = 5;
+            else
+                *move = corner_arr[rand() % 4] + 1;
+        }
+        else if (remainMove == 5)
+        {
+        }
+        else if (remainMove == 3)
+        {
+        }
+        else if (remainMove == 1)
+        {
+        }
+    }
+    else if (whichTypeGame == PLAY_WITH_EVIL_COMPUTER)
+    {
+        move = (int *)malloc(sizeof(int) * 2);
+    }
+    return move;
+}
+
+void printBottomBar()
+{
+    printColor(COLOR_YELLOW);
+    printf("\n\n###########################################################################");
 }
 
 void printBoard(const char *firstPlayerName, const char *secondPlayerName)
@@ -326,6 +243,17 @@ void printBoard(const char *firstPlayerName, const char *secondPlayerName)
     printf("\n\n###########################################################################");
 }
 
+void printColor(const char *COLOR) { printf("%s", COLOR); }
+
+void printGameOverScreen(const char *firstPlayerName, const char *secondPlayerName)
+{
+    printBoard(firstPlayerName, secondPlayerName);
+    printColor(COLOR_WHITE);
+    printf("\n\n\t\t\tGame Draw");
+    printBottomBar();
+    askUsetToPlayAgainOrNot();
+}
+
 void printWinScreen(char winner, const char *firstPlayerName, const char *secondPlayerName)
 {
     printBoard(firstPlayerName, secondPlayerName);
@@ -343,11 +271,121 @@ void printWinScreen(char winner, const char *firstPlayerName, const char *second
     askUsetToPlayAgainOrNot();
 }
 
-void printGameOverScreen(const char *firstPlayerName, const char *secondPlayerName)
+void playGame(const int whichTypeGame, const char *firstPlayerName, const char *secondPlayerName)
 {
-    printBoard(firstPlayerName, secondPlayerName);
-    printColor(COLOR_WHITE);
-    printf("\n\n\t\t\tGame Draw");
-    printBottomBar();
-    askUsetToPlayAgainOrNot();
+    if (remainMove <= 9 && remainMove >= 1)
+    {
+        --remainMove;
+        printBoard(firstPlayerName, secondPlayerName);
+        resultArray[getValidInputMove(whichTypeGame, firstPlayerName, secondPlayerName)] = gameMove;
+        switch (getResult())
+        {
+        case 'x':
+            gameEnd = 't';
+            printWinScreen('x', firstPlayerName, secondPlayerName);
+            break;
+        case 'o':
+            gameEnd = 't';
+            printWinScreen('o', firstPlayerName, secondPlayerName);
+            break;
+        default:
+            gameEnd = 'f';
+            playGame(whichTypeGame, firstPlayerName, secondPlayerName);
+        }
+    }
+    else
+    {
+        gameEnd = 't';
+        printGameOverScreen(firstPlayerName, secondPlayerName);
+    }
+}
+
+void playWithEvilComputer()
+{
+    clearScreen();
+    char *playerName = (char *)malloc(30 * sizeof(char));
+    setUsername(playerName, "\t\t\tEnter player name");
+    playGame(PLAY_WITH_EVIL_COMPUTER, playerName, "Evil Computer");
+}
+
+void playWithPlayer()
+{
+    clearScreen();
+    char *firstPlayerName = (char *)malloc(30 * sizeof(char));
+    char *secondPlayerName = (char *)malloc(30 * sizeof(char));
+    setUsername(firstPlayerName, "\t\t\tEnter first player name");
+    setUsername(secondPlayerName, "\t\t\tEnter second player name");
+    playGame(PLAY_WITH_PLAYER, firstPlayerName, secondPlayerName);
+}
+
+void playWithSmartComputer()
+{
+    clearScreen();
+    char *playerName = (char *)malloc(30 * sizeof(char));
+    setUsername(playerName, "\t\t\tEnter player name");
+    playGame(PLAY_WITH_SMART_COMPUTER, playerName, "Smart Computer");
+}
+
+void restartGame()
+{
+    fflush(stdin);
+    remainMove = 9;
+    gameMove = 'o';
+    gameMove = 'f';
+    for (int i = 0; i < 9; ++i)
+    {
+        resultArray[i] = 'e';
+        inputArray[i] = i + 1;
+    }
+    startGame();
+}
+
+void setUsername(char *username, const char *message)
+{
+    fflush(stdin);
+    printf("\n%s : ", message);
+    fgets(username, 30, stdin);
+    if (strlen(username) > 1)
+        username[strlen(username) - 1] = '\0';
+}
+
+void startGame()
+{
+    int choice, dM = 0;
+    do
+    {
+        clearScreen();
+        printf("\n\t\t\t1. Want to play with Smart Computer");
+        printf("\n\t\t\t2. Want to play with Evil Computer");
+        printf("\n\t\t\t3. Want to play with Player");
+        printf("\n\t\t\t4. Exit");
+        if (dM == 1)
+            printf("\n\n\t\t\tPlease enter valid choice : ");
+        else
+        {
+            printf("\n\n\t\t\tEnter your choice : ");
+            dM = 0;
+        }
+        fflush(stdin);
+        scanf("%d", &choice);
+        switch (choice)
+        {
+        case 1:
+            playWithSmartComputer();
+            break;
+        case 2:
+            playWithEvilComputer();
+            break;
+        case 3:
+            playWithPlayer();
+            break;
+        case 4:
+            clearScreen();
+            printColor(COLOR_DEFAULT);
+            exit(0);
+            break;
+        default:
+            dM = 1;
+        }
+    } while (1);
 }
