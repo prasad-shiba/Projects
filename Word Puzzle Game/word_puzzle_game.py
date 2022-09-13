@@ -1,6 +1,8 @@
 import random
+import os
 words=['WORLD','GOVERNMENT','WORK','TIME','COMPUTER','FATHER','MOTHER','SON','DAUGHTER','GREEN','BLUE','RED','WHITE','YELLOW','AEROPLANE','PROGRAMMING','LANGUAGE','CITIZENSHIP','SCHOLARSHIP','STEAMBOAT','RAFT','DISCIPLINE','INFORMATION','LEARNING','FRIENDSHIP','EARTH','CLOUD','PLANET','LIBERTY','MARTYR','SOVEREIGN','SUPREME','TIMELINE','SUNRISE','JOYFUL']
 def play(game_words):
+    os.system('cls')
     print('\n\n')
     score=0
     for w in game_words:
@@ -13,7 +15,7 @@ def play(game_words):
             print('\n\nWrong\n')
             score-=1
     else:
-        print('Net Score is',score)
+        print('Net Score is',score,end='\n\n\n')
 def get_randomint(l,u):
     if(u>0):
         r=random.randint(0,u)
